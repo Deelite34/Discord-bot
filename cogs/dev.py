@@ -1,16 +1,15 @@
 import logging
 from discord import Interaction, Member, Message, app_commands
 from discord.ext import commands
+from bot import DiscordBot
 from constants import TEST_GUILD
 from responses import get_response
 
 
-logger = logging.getLogger("discord")
-
-
 class DevelopmentCommands(commands.Cog):
     def __init__(self, bot):
-        self.bot: commands.Bot = bot
+        self.bot: DiscordBot = bot
+        self.logger: logging.Logger = logging.getLogger("discord")
         self.show_join_date_ctx_menu = app_commands.ContextMenu(
             name="Show join date", callback=self.get_joined_date
         )
@@ -26,8 +25,8 @@ class DevelopmentCommands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        logger.info(f"Using guild id {TEST_GUILD.id}")
-        logger.info(f"Bot {self.bot.user} has logged in!")
+        self.logger.info(f"Using guild id {TEST_GUILD.id}")
+        self.logger.info(f"Bot {self.bot.user} has logged in!")
 
     @app_commands.command()
     async def speak(self, ctx: Interaction):
@@ -46,9 +45,9 @@ class DevelopmentCommands(commands.Cog):
         Use this after creating new command or context menu option,
         to immediately sync and make it work in TEST_GUILD.
         """
-        logger.info("Syncing commands with the test guild.")
+        self.logger.info("Syncing commands with the test guild.")
 
-        # self.bot.tree.copy_global_to(guild=TEST_GUILD)
+        self.bot.tree.copy_global_to(guild=TEST_GUILD)
         synced_commands = await self.bot.tree.sync(guild=TEST_GUILD)
 
         await ctx.response.send_message(
@@ -67,7 +66,7 @@ class DevelopmentCommands(commands.Cog):
         to sync them with all servers. This may take up to about 1 hour, before
         actions appear (dissapear) in the end servers.
         """
-        logger.info(
+        self.logger.info(
             "Synchronizing commands with all bot discord servers, this may take about 1 hour to see in the end discord servers."
         )
         commands = await self.bot.tree.sync()
@@ -81,7 +80,7 @@ class DevelopmentCommands(commands.Cog):
         description="Copies commands to the test guild.",
     )
     async def copy_commands_global(self, ctx: Interaction):
-        logger.info("Copying commands to the test guild.")
+        self.logger.info("Copying commands to the test guild.")
         self.bot.tree.copy_global_to(guild=TEST_GUILD)
         await ctx.response.send_message(
             "Copied commands to the test guild.", ephemeral=True
@@ -104,7 +103,7 @@ class DevelopmentCommands(commands.Cog):
         """
 
         if not user_message:
-            logger.info(
+            self.logger.info(
                 "(Message was empty because intents were probably not enabled )"
             )
             return
@@ -130,9 +129,9 @@ class DevelopmentCommands(commands.Cog):
         user_message: str = str(message.content)
         channel: str = str(message.channel)
 
-        logger.info(f"[{channel}] {username}: '{user_message}'")
+        self.logger.info(f"[{channel}] {username}: '{user_message}'")
         await self.send_message(message, user_message)
 
 
-async def setup(bot):
+async def setup(bot: DiscordBot) -> None:
     await bot.add_cog(DevelopmentCommands(bot))

@@ -1,11 +1,7 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from utils import MetaSingleton
-
-
-# Useful discussion on setting up sqlalchemy, and discord bot db structure
-# https://discord.com/channels/336642139381301249/1223723644933505044
 
 
 class DatabaseSingleton(metaclass=MetaSingleton):
@@ -21,9 +17,9 @@ class DatabaseSingleton(metaclass=MetaSingleton):
             await conn.run_sync(self.base.metadata.create_all)
 
     async def close_async(self):
-        # Use me on shutdown!
+        # Use on shutdown
         await self.engine.dispose()
 
-    def create_session(self):
+    def create_session(self) -> AsyncSession:
         session_maker = async_sessionmaker(bind=self.engine, expire_on_commit=False)
         return session_maker()
