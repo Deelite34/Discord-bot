@@ -30,6 +30,7 @@ async def main() -> None:
     async with bot:
         await bot.load_extension("cogs.dev")
         await bot.load_extension("cogs.base")
+        await bot.load_extension("cogs.gambling")
         await bot.start(TOKEN)
 
 

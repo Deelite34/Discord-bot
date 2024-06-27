@@ -7,7 +7,7 @@ from responses import get_response
 
 
 class DevelopmentCommands(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: DiscordBot):
         self.bot: DiscordBot = bot
         self.logger: logging.Logger = logging.getLogger("discord")
         self.show_join_date_ctx_menu = app_commands.ContextMenu(
@@ -118,7 +118,7 @@ class DevelopmentCommands(commands.Cog):
             else:
                 await message.channel.send(response)
         except Exception as e:
-            print(e)
+            self.logger.error(e)
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
