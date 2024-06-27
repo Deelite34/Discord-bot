@@ -1,9 +1,8 @@
 import logging
-from discord import Interaction, Member, Message, app_commands
+from discord import Interaction, Member, app_commands
 from discord.ext import commands
 from bot import DiscordBot
 from constants import TEST_GUILD
-from responses import get_response
 
 
 class DevelopmentCommands(commands.Cog):
@@ -46,6 +45,8 @@ class DevelopmentCommands(commands.Cog):
         to immediately sync and make it work in TEST_GUILD.
         """
         self.logger.info("Syncing commands with the test guild.")
+
+        #self.bot.tree.clear_commands(guild=TEST_GUILD)
 
         self.bot.tree.copy_global_to(guild=TEST_GUILD)
         synced_commands = await self.bot.tree.sync(guild=TEST_GUILD)
@@ -95,43 +96,6 @@ class DevelopmentCommands(commands.Cog):
         await interaction.response.send_message(
             f"Should I actually ban {member}...", ephemeral=True
         )
-
-    async def send_message(self, message: Message, user_message: str) -> None:
-        """
-        handles sending response to a command.
-        User who preppends with question mark will receive response as direct message.
-        """
-
-        if not user_message:
-            self.logger.info(
-                "(Message was empty because intents were probably not enabled )"
-            )
-            return
-
-        if send_priv_response := user_message[0] == "?":
-            user_message = user_message[1:]
-
-        try:
-            response: str = get_response(user_message)
-            if send_priv_response:
-                await message.author.send(response)
-            else:
-                await message.channel.send(response)
-        except Exception as e:
-            self.logger.error(e)
-
-    @commands.Cog.listener()
-    async def on_message(self, message: Message):
-        if message.author == self.bot.user:
-            return
-
-        username: str = str(message.author)
-        user_message: str = str(message.content)
-        channel: str = str(message.channel)
-
-        self.logger.info(f"[{channel}] {username}: '{user_message}'")
-        await self.send_message(message, user_message)
-
 
 async def setup(bot: DiscordBot) -> None:
     await bot.add_cog(DevelopmentCommands(bot))
