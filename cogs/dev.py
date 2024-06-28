@@ -22,11 +22,6 @@ class DevelopmentCommands(commands.Cog):
         self.bot.tree.add_command(self.show_join_date_ctx_menu)
         self.bot.tree.add_command(self.maybe_ban_user_ctx_menu)
 
-    @commands.Cog.listener()
-    async def on_ready(self) -> None:
-        self.logger.info(f"Using guild id {TEST_GUILD.id}")
-        self.logger.info(f"Bot {self.bot.user} has logged in!")
-
     @app_commands.command()
     async def speak(self, ctx: Interaction):
         await ctx.response.send_message("I speak!")
@@ -46,7 +41,7 @@ class DevelopmentCommands(commands.Cog):
         """
         self.logger.info("Syncing commands with the test guild.")
 
-        #self.bot.tree.clear_commands(guild=TEST_GUILD)
+        # self.bot.tree.clear_commands(guild=TEST_GUILD)
 
         self.bot.tree.copy_global_to(guild=TEST_GUILD)
         synced_commands = await self.bot.tree.sync(guild=TEST_GUILD)
@@ -96,6 +91,7 @@ class DevelopmentCommands(commands.Cog):
         await interaction.response.send_message(
             f"Should I actually ban {member}...", ephemeral=True
         )
+
 
 async def setup(bot: DiscordBot) -> None:
     await bot.add_cog(DevelopmentCommands(bot))

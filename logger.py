@@ -3,6 +3,7 @@ import sys
 
 
 def setup_logger(logger: logging.Logger):
+    logger.handlers.clear()
     logger.setLevel(logging.DEBUG)
 
     console_log_handler = logging.StreamHandler(sys.stdout)
